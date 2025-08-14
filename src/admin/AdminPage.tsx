@@ -2,7 +2,7 @@ import React from 'react'
 import { useProjects } from '@/context/ProjectsContext'
 import AddProjectForm from './AddProjectForm'
 import { Shield, Lock, Trash2, Github, ExternalLink } from 'lucide-react'
-import { db } from '@/lib/firebase'
+import { getFirebase } from '@/lib/firebase'
 import { doc, getDoc } from 'firebase/firestore'
 
 export default function AdminPage() {
@@ -12,11 +12,12 @@ export default function AdminPage() {
   const [error, setError] = React.useState('')
 
   const handleLogin = async () => {
-    if (!db) { setError('Adatbázis hiba.'); return }
     setError('')
     try {
+      const { db } = await getFirebase()               // <-- db lekérése runtime-ból
       const docRef = doc(db, 'config', 'admin')
       const docSnap = await getDoc(docRef)
+
       if (docSnap.exists()) {
         const correctPin = (docSnap.data() as any).pin
         if (pin === String(correctPin)) setIsLoggedIn(true)

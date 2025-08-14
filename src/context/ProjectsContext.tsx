@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { Project } from '@/types'
-import { auth, db } from '@/lib/firebase'
+import { getFirebase } from '@/lib/firebase'
 import { signInAnonymously, onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth'
-import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, writeBatch, getDocs, query, orderBy } from 'firebase/firestore'
+import { collection, onSnapshot, addDoc, deleteDoc, doc, writeBatch, getDocs, query, orderBy } from 'firebase/firestore'
 
 type ProjectsContextType = {
   projects: Project[]
@@ -12,8 +12,9 @@ type ProjectsContextType = {
 }
 
 const ProjectsContext = createContext<ProjectsContextType | null>(null)
+
 export const useProjects = () => {
-  const ctx = React.useContext(ProjectsContext)
+  const ctx = useContext(ProjectsContext)
   if (!ctx) throw new Error('useProjects must be used within ProjectsProvider')
   return ctx
 }
@@ -45,41 +46,55 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
   const [projects, setProjects] = useState<Project[]>([])
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
 
-  // Auth (anonymous sign-in)
+  // Auth (anonymous sign-in) – getFirebase() használata
   useEffect(() => {
-    if (!auth) return
-    const unsubscribe = onAuthStateChanged(auth, user => {
-      if (user) {
-        setFirebaseUser(user)
-      } else {
-        signInAnonymously(auth).catch(error => console.error('Anonymous sign-in failed:', error))
+    let unsubscribe = () => {}
+    ;(async () => {
+      try {
+        const { auth } = await getFirebase()
+        unsubscribe = onAuthStateChanged(auth, user => {
+          if (user) {
+            setFirebaseUser(user)
+          } else {
+            signInAnonymously(auth).catch(err => console.error('Anonymous sign-in failed:', err))
+          }
+        })
+      } catch (e) {
+        console.error('Auth init error:', e)
       }
-    })
+    })()
     return () => unsubscribe()
   }, [])
 
-  // Firestore realtime projects
+  // Firestore realtime projects – getFirebase() használata
   useEffect(() => {
-    if (!db || !firebaseUser) return
-
-    const projectsCollectionRef = collection(db, 'projects')
-    const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'))
-    const unsubscribe = onSnapshot(
-      q,
-      (querySnapshot) => {
-        const projectsData = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() })) as Project[]
-        setProjects(projectsData)
-      },
-      (error) => {
-        console.error('Error fetching projects:', error)
+    if (!firebaseUser) return
+    let unsubscribe = () => {}
+    ;(async () => {
+      try {
+        const { db } = await getFirebase()
+        const projectsCollectionRef = collection(db, 'projects')
+        const qy = query(projectsCollectionRef, orderBy('createdAt', 'desc'))
+        unsubscribe = onSnapshot(
+          qy,
+          (snap) => {
+            const data = snap.docs.map(d => ({ id: d.id, ...d.data() })) as Project[]
+            setProjects(data)
+          },
+          (error) => {
+            console.error('Error fetching projects:', error)
+          }
+        )
+      } catch (e) {
+        console.error('Firestore init error:', e)
       }
-    )
+    })()
     return () => unsubscribe()
   }, [firebaseUser])
 
   const addProject = async (p: Omit<Project, 'id' | 'createdAt'>) => {
-    if (!db) return
     try {
+      const { db } = await getFirebase()
       await addDoc(collection(db, 'projects'), { ...p, createdAt: new Date() })
     } catch (e) {
       console.error('Error adding document: ', e)
@@ -87,8 +102,8 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
   }
 
   const deleteProject = async (id: string) => {
-    if (!db) return
     try {
+      const { db } = await getFirebase()
       await deleteDoc(doc(db, 'projects', id))
     } catch (e) {
       console.error('Error deleting document: ', e)
@@ -96,8 +111,8 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
   }
 
   const resetToDefaults = async () => {
-    if (!db) return
     try {
+      const { db } = await getFirebase()
       const batch = writeBatch(db)
       const projectsCollectionRef = collection(db, 'projects')
       const snapshot = await getDocs(projectsCollectionRef)
