@@ -12,7 +12,7 @@ export default function VideoEmbed({ url, title }: { url: string; title: string 
           title={`${title} – videó`}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
-          className="w-full h-full"
+          className="w-full h-full" loading="lazy" referrerPolicy="strict-origin-when-cross-origin"
         />
       </div>
     )

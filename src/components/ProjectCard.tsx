@@ -13,7 +13,7 @@ const ProjectCard: React.FC<{ project: Project; onSelect: () => void }> = React.
       <img
         src={project.imageUrl || placeholderFor(project.title)}
         alt={project.title}
-        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" decoding="async"
         loading="lazy"
         decoding="async"
         onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://placehold.co/600x400/ef4444/ffffff?text=Hiba'; }}

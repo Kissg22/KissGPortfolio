@@ -1,3 +1,4 @@
+import type { Timestamp } from 'firebase/firestore'
 export type Project = {
   id: string
   title: string
@@ -7,5 +8,5 @@ export type Project = {
   liveUrl?: string | null
   repoUrl?: string | null
   videoUrl?: string | null
-  createdAt?: any
+  createdAt?: Timestamp | null
 }
