@@ -3,6 +3,4 @@
 @tailwind utilities;
 
 html { scroll-behavior: smooth; }
-*::selection { @apply bg-indigo-500/30;
-  scroll-padding-top: 96px; /* igazítsd a header magasságára */
- }
+*::selection { @apply bg-indigo-500/30; }

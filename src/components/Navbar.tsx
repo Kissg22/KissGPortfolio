@@ -1,69 +1,22 @@
 import React from 'react'
 import { Sun, Moon, Menu } from 'lucide-react'
 
-type Props = {
-  theme: 'light' | 'dark'
-  toggleTheme: () => void
-  activeSection: string
-  /** Opcionális: parent értesítése kattintáskor (eventtel + id-vel) */
-  onNavClick?: (e: React.MouseEvent<HTMLElement>, id: string) => void
-}
-
-const HEADER_OFFSET = 88 // px – h-[88px] alapján
-
-function scrollToId(id: string, offset = HEADER_OFFSET) {
-  const el = document.getElementById(id)
-  if (!el) return
-  const top = el.offsetTop - offset
-  window.scrollTo({ top, behavior: 'smooth' })
-  history.replaceState(null, '', `#${id}`)
-}
-
 export default function Navbar({
-  theme, toggleTheme, activeSection, onNavClick
-}: Props) {
+  theme, toggleTheme, activeSection
+}: { theme: 'light' | 'dark', toggleTheme: () => void, activeSection: string }) {
   const [mobileOpen, setMobileOpen] = React.useState(false)
-  // Azonnali vizuális visszajelzés kattintáskor:
-  const [pendingActive, setPendingActive] = React.useState<string | null>(null)
-
-  React.useEffect(() => {
-    // Ha a parent frissítette az aktívat (scroll-spy), engedjük el a pendinget
-    setPendingActive(null)
-  }, [activeSection])
-
   const navItems = [
     { id: 'home', label: 'Kezdőlap' },
     { id: 'rolam', label: 'Rólam' },
     { id: 'projektek', label: 'Projektek' },
     { id: 'kapcsolat', label: 'Kapcsolat' },
     { id: 'admin', label: 'Admin' },
-  ] as const
+  ]
 
   React.useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [mobileOpen])
-
-  const isActive = (id: string) => (pendingActive ?? activeSection) === id
-
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    // azonnali jelzés
-    setPendingActive(id)
-
-    if (onNavClick) {
-      // delegálunk a parentnek (ő intézi a preventDefault-ot + offsetelt scrollt)
-      onNavClick(e, id)
-    } else {
-      // fallback: mi intézzük
-      e.preventDefault()
-      scrollToId(id, HEADER_OFFSET)
-    }
-
-    if (mobileOpen) setMobileOpen(false)
-  }
-
-  const linkBase =
-    'font-medium transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded'
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm dark:shadow-slate-800/50 h-[88px]">
@@ -77,13 +30,12 @@ export default function Navbar({
             <a
               key={item.id}
               href={`#${item.id}`}
-              onClick={(e) => handleClick(e, item.id)}
-              className={`${linkBase} ${
-                isActive(item.id) && item.id !== 'admin'
+              className={`font-medium transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded ${
+                activeSection === item.id && item.id !== 'admin'
                   ? 'text-indigo-500 dark:text-indigo-400'
                   : 'text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400'
               }`}
-              aria-current={isActive(item.id) ? 'page' : undefined}
+              aria-current={activeSection === item.id ? 'page' : undefined}
             >
               {item.label}
             </a>
@@ -117,9 +69,9 @@ export default function Navbar({
               <li key={item.id}>
                 <a
                   href={`#${item.id}`}
-                  onClick={(e) => handleClick(e, item.id)}
+                  onClick={() => setMobileOpen(false)}
                   className={`block px-3 py-2 rounded-md font-medium transition-colors ${
-                    isActive(item.id) && item.id !== 'admin'
+                    activeSection === item.id && item.id !== 'admin'
                       ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                   }`}
