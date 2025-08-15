@@ -8,6 +8,7 @@ import ProjectsSection from '@/sections/ProjectsSection'
 import ContactSection from '@/sections/ContactSection'
 import { ProjectsProvider } from '@/context/ProjectsContext'
 import { ensureMeta, setDynamicFavicon } from '@/utils/dom'
+import { useScrollSpy } from '@/hooks/useScrollSpy' // ← ÚJ
 
 function MainPage() {
   const [theme, setTheme] = React.useState<'light' | 'dark'>(() => {
@@ -26,35 +27,26 @@ function MainPage() {
     setDynamicFavicon(theme)
   }, [theme])
 
-  const [activeSection, setActiveSection] = React.useState('home')
+  // ↓↓↓ Ezeknek az ID-knak meg kell egyezniük a szekciók gyökér elemének id-jával
   const sectionIds = React.useMemo(() => ['home', 'rolam', 'projektek', 'kapcsolat'], [])
-
-  React.useEffect(() => {
-    const navbarHeight = 88
-    const options: IntersectionObserverInit = {
-      rootMargin: `${-navbarHeight}px 0px ${-(window.innerHeight - navbarHeight - 1)}px 0px`,
-    }
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) setActiveSection((entry.target as HTMLElement).id)
-      })
-    }
-    const observer = new IntersectionObserver(observerCallback, options)
-    sectionIds.forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el) })
-    return () => observer.disconnect()
-  }, [sectionIds])
+  const { activeId, handleNavClick } = useScrollSpy(sectionIds, { offset: 88, activationRatio: 0.35 })
 
   const toggleTheme = React.useCallback(() => setTheme(t => t === 'dark' ? 'light' : 'dark'), [])
 
   return (
     <div className="bg-gray-100 dark:bg-slate-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-500">
       <SkipToContent />
-      <Navbar theme={theme} toggleTheme={toggleTheme} activeSection={activeSection} />
+      <Navbar
+        theme={theme}
+        toggleTheme={toggleTheme}
+        activeSection={activeId}
+        onNavClick={handleNavClick} // ← kattintáskor azonnali aktiválás + offsetelt scroll
+      />
       <main id="content" className="outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
-        <HeroSection />
-        <AboutSection />
-        <ProjectsSection />
-        <ContactSection />
+        <HeroSection />      {/* id="home" */}
+        <AboutSection />     {/* id="rolam" */}
+        <ProjectsSection />  {/* id="projektek" */}
+        <ContactSection />   {/* id="kapcsolat" */}
       </main>
       <Footer />
     </div>
@@ -62,7 +54,10 @@ function MainPage() {
 }
 
 export default function App() {
-  const [route, setRoute] = React.useState(window.location.hash)
+  const [route, setRoute] = React.useState<string>(() =>
+    typeof window !== 'undefined' ? window.location.hash : ''
+  )
+
   React.useEffect(() => {
     const handleHashChange = () => setRoute(window.location.hash)
     window.addEventListener('hashchange', handleHashChange)

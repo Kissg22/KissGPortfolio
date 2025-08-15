@@ -3,7 +3,7 @@ import { User } from 'lucide-react'
 
 export default function AboutSection() {
   return (
-    <section id="rolam" className="scroll-mt-24 py-20 lg:py-32 bg-white dark:bg-slate-800">
+    <section id="rolam" className="scroll-mt-24 min-h-[50vh] py-20 lg:py-32 bg-white dark:bg-slate-800">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-center">

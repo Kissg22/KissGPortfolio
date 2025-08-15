@@ -3,7 +3,7 @@ import { Github } from 'lucide-react'
 
 export default function HeroSection() {
   return (
-    <section id="home" className="scroll-mt-24 text-center bg-gray-100 dark:bg-slate-900 px-4 pt-20 md:pt-24 pb-20 md:pb-28">
+    <section id="home" className="scroll-mt-24 min-h-[50vh] text-center bg-gray-100 dark:bg-slate-900 px-4 pt-20 md:pt-24 pb-20 md:pb-28">
       <div className="max-w-4xl mx-auto flex flex-col items-center">
         <img src="https://placehold.co/128x128/4338ca/ffffff?text=KG" alt="Kiss Gábor profilképe"
              className="rounded-full w-32 h-32 mb-6 shadow-xl border-4 border-indigo-500/50" loading="lazy" decoding="async" />
