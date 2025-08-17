@@ -27,70 +27,67 @@ export default function ContactSection() {
           </p>
         </div>
 
-        {/* Új, letisztult kártya */}
-        <div className="relative mx-auto max-w-3xl rounded-3xl border border-slate-200/70 dark:border-slate-700/60 bg-white/90 dark:bg-slate-900/85 shadow-sm backdrop-blur">
-          {/* dekoratív, finom háttér-blobok (nem zavaró, de ad mélységet) */}
-          <div className="pointer-events-none absolute -top-12 -left-12 h-40 w-40 rounded-full bg-indigo-400/10 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-10 -right-10 h-48 w-48 rounded-full bg-fuchsia-400/10 blur-3xl" />
+        <div className="mx-auto max-w-3xl space-y-3">
+          {/* Email kártya (nem kattintható) */}
+          <div className="relative rounded-3xl border border-slate-200/70 dark:border-slate-700/60 bg-white/90 dark:bg-slate-900/85 shadow-sm backdrop-blur">
+            {/* dekoratív, finom háttér-blobok */}
+            <div className="pointer-events-none absolute -top-12 -left-12 h-40 w-40 rounded-full bg-indigo-400/10 blur-2xl" />
+            <div className="pointer-events-none absolute -bottom-10 -right-10 h-48 w-48 rounded-full bg-fuchsia-400/10 blur-3xl" />
 
-          <div className="relative z-10 p-6 md:p-8">
-            <div className="flex flex-col gap-5">
-              {/* Email „box button” – másolás */}
-              <button
-                type="button"
-                onClick={copyEmail}
-                className={[
-                  "group w-full rounded-2xl border",
-                  "border-slate-200 dark:border-slate-700",
-                  "bg-slate-50 dark:bg-slate-950",
-                  "px-5 py-4 text-left",
-                  "shadow-sm hover:shadow-md",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
-                  "transition"
-                ].join(" ")}
-                aria-live="polite"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div className="min-w-0">
-                    <div className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">E-mail cím</div>
-                    <div className="mt-1 truncate text-lg md:text-xl font-semibold text-slate-900 dark:text-white select-all">
-                      {email}
-                    </div>
-                  </div>
-                  <div className="shrink-0 inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-slate-900 dark:text-slate-100 shadow-sm group-hover:shadow-md transition">
-                    {copied ? <Check className="h-5 w-5 text-emerald-600" /> : <Copy className="h-5 w-5" />}
-                    <span className="text-sm font-medium">{copied ? 'Másolva!' : 'Másolás'}</span>
+            <div className="relative z-10 p-6 md:p-8">
+              <div className="flex items-center gap-4 sm:gap-6">
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">E-mail cím</div>
+                  <div className="mt-1 truncate text-lg md:text-xl font-semibold text-slate-900 dark:text-white select-all">
+                    {email}
                   </div>
                 </div>
-              </button>
 
-              {/* Írj nekem – külön, esztétikus primer gomb */}
-              <a
-                href={`mailto:${email}`}
-                aria-label={`E-mail küldése: ${email}`}
-                className={[
-                  "inline-flex w-full items-center justify-center gap-2",
-                  "rounded-2xl px-6 py-4 text-base font-medium",
-                  "bg-gradient-to-r from-indigo-600 to-violet-600 text-white",
-                  "shadow-sm hover:shadow-lg",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
-                  "transition"
-                ].join(" ")}
-              >
-                <Mail className="h-5 w-5" />
-                Írj nekem
-              </a>
+                {/* Inline másolás gomb csak >= sm (asztali) */}
+                <button
+                  type="button"
+                  onClick={copyEmail}
+                  className="hidden sm:inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 font-medium text-slate-900 dark:text-slate-100 shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:translate-y-px transition"
+                  aria-live="polite"
+                >
+                  {copied ? <Check className="h-5 w-5 text-emerald-600" /> : <Copy className="h-5 w-5" />}
+                  {copied ? 'Másolva!' : 'Másolás'}
+                </button>
+              </div>
             </div>
-
-            <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
-              Tipp: fent kattintva az e-mail cím a vágólapra másolódik, alul pedig megnyílik a leveleződ.
-            </p>
-
-            {/* SR visszajelzés olvasóprogramoknak */}
-            <span className="sr-only" aria-live="polite">
-              {copied ? 'E-mail cím a vágólapra másolva.' : ''}
-            </span>
           </div>
+
+          {/* Mobil külön másolás gomb (sm:hidden) az "Írj nekem" fölött */}
+          <div className="sm:hidden">
+            <button
+              type="button"
+              onClick={copyEmail}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-3.5 font-medium text-slate-900 dark:text-slate-100 shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:translate-y-px transition"
+              aria-live="polite"
+            >
+              {copied ? <Check className="h-5 w-5 text-emerald-600" /> : <Copy className="h-5 w-5" />}
+              {copied ? 'Másolva!' : 'Másolás'}
+            </button>
+          </div>
+
+          {/* Írj nekem (mailto) – teljes szélesség */}
+          <a
+            href={`mailto:${email}`}
+            aria-label={`E-mail küldése: ${email}`}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-medium bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
+          >
+            <Mail className="h-5 w-5" />
+            Írj nekem
+          </a>
+
+          <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+            Tipp: az email kártyán látod a címet, mobilon a „Másolás” gomb külön jelenik meg fölötte.
+          </p>
+
+          {/* SR visszajelzés olvasóprogramoknak */}
+          <span className="sr-only" aria-live="polite">
+            {copied ? 'E-mail cím a vágólapra másolva.' : ''}
+          </span>
         </div>
       </div>
     </section>
