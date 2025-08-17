@@ -34,7 +34,7 @@ function MainPage() {
 
   const [activeSection, setActiveSection] = React.useState('home')
   const sectionIds = React.useMemo(
-    () => ['home', 'rolam', 'projektek', 'oneletrajz', 'kapcsolat'],
+    () => ['home', 'rolam', 'munkaim', 'oneletrajz', 'kapcsolat'],
     []
   )
 
