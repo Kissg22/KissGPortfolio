@@ -2,5 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-html { scroll-behavior: smooth; }
-*::selection { @apply bg-indigo-500/30; }
+/* Globális görgetés offset a navbarhoz (nem kell scroll-mt hack) */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-h, 88px);
+}

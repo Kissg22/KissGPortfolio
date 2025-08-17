@@ -6,9 +6,9 @@ import HeroSection from '@/sections/HeroSection'
 import AboutSection from '@/sections/AboutSection'
 import ProjectsSection from '@/sections/ProjectsSection'
 import ContactSection from '@/sections/ContactSection'
+import ResumeSection from '@/sections/ResumeSection'
 import { ProjectsProvider } from '@/context/ProjectsContext'
 import { ensureMeta, setDynamicFavicon } from '@/utils/dom'
-import ResumeSection from '@/sections/ResumeSection' // alias használat egységesen
 
 function MainPage() {
   const [theme, setTheme] = React.useState<'light' | 'dark'>(() => {
@@ -24,63 +24,114 @@ function MainPage() {
     try { localStorage.setItem('theme', theme) } catch {}
     const meta = ensureMeta('theme-color')
     meta.content = theme === 'dark' ? '#0f172a' : '#ffffff'
-    setDynamicFavicon(theme) // ⟵ FIX: string union megy be, nem boolean
+    setDynamicFavicon(theme) // fontos: string union, nem boolean
   }, [theme])
 
-  const [activeSection, setActiveSection] = React.useState('home')
-  // FIX: elírás javítva: 'oneltrajt' -> 'oneletrajz'
-  const sectionIds = React.useMemo(() => ['home', 'rolam', 'munkaim', 'oneletrajz', 'kapcsolat'], [])
+  const toggleTheme = React.useCallback(
+    () => setTheme(t => (t === 'dark' ? 'light' : 'dark')),
+    []
+  )
 
-  // 1) IntersectionObserver mindenre, KIVÉVE 'kapcsolat'
+  // Nav magasság mérése + CSS változó beállítása
+  const [navH, setNavH] = React.useState(88)
   React.useEffect(() => {
-    const navbarHeight = 88
-    const options: IntersectionObserverInit = {
-      rootMargin: `${-navbarHeight}px 0px ${-(window.innerHeight - navbarHeight - 1)}px 0px`,
+    const header = document.getElementById('site-header')
+    const getH = () => Math.max(0, header?.offsetHeight ?? 88)
+    const apply = () => {
+      const h = getH()
+      setNavH(h)
+      document.documentElement.style.setProperty('--nav-h', `${h}px`)
     }
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue
-        const id = (entry.target as HTMLElement).id
-        if (id === 'kapcsolat') continue // a kapcsolatot külön kezeljük az alja alapján
-        setActiveSection(prev => (prev === id ? prev : id))
-      }
-    }
-    const observer = new IntersectionObserver(observerCallback, options)
-    sectionIds.forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el) })
-    return () => observer.disconnect()
-  }, [sectionIds])
-
-  // 2) Kizárólag a 'kapcsolat' aktiválása AZ ALJA alapján (+ oldal legalja fallback)
-  React.useEffect(() => {
-    const updateContactActive = () => {
-      const el = document.getElementById('kapcsolat')
-      if (!el) return
-      const r = el.getBoundingClientRect()
-      const vh = window.innerHeight
-
-      // Aktív, ha az alja már bent van a viewportban
-      const bottomInView = r.bottom <= vh && r.top < vh
-
-      // Oldal legalja eset
-      const atBottom =
-        Math.ceil(window.scrollY + window.innerHeight) >=
-        Math.ceil(document.documentElement.scrollHeight)
-
-      if (bottomInView || atBottom) {
-        setActiveSection(prev => (prev === 'kapcsolat' ? prev : 'kapcsolat'))
-      }
-    }
-
-    updateContactActive()
-    window.addEventListener('scroll', updateContactActive, { passive: true })
-    window.addEventListener('resize', updateContactActive)
+    apply()
+    const ro = new ResizeObserver(apply)
+    if (header) ro.observe(header)
+    window.addEventListener('resize', apply)
     return () => {
-      window.removeEventListener('scroll', updateContactActive)
-      window.removeEventListener('resize', updateContactActive)
+      ro.disconnect()
+      window.removeEventListener('resize', apply)
     }
   }, [])
 
-  const toggleTheme = React.useCallback(() => setTheme(t => t === 'dark' ? 'light' : 'dark'), [])
+  const [activeSection, setActiveSection] = React.useState('home')
+  const sectionIds = React.useMemo(
+    () => ['home', 'rolam', 'projektek', 'oneletrajz', 'kapcsolat'],
+    []
+  )
+
+  // Stabil aktív-szekció észlelés "vonal" alapján (navbar alja),
+  // + oldal legalja fallback (Kapcsolat aktív lesz)
+  React.useEffect(() => {
+    let ticking = false
+
+    const updateActive = () => {
+      const NAV = navH
+      const y = NAV + 1 // a vonal, ami alatt "nézünk"
+      let active = sectionIds[0]
+
+      const els = sectionIds
+        .map(id => document.getElementById(id))
+        .filter((el): el is HTMLElement => !!el)
+
+      // 1) amelyik szekció átfedi a NAV vonalat
+      let found = false
+      for (const el of els) {
+        const r = el.getBoundingClientRect()
+        if (r.top <= y && r.bottom > y) {
+          active = el.id
+          found = true
+          break
+        }
+      }
+
+      // 2) ha nem találtunk, de az oldal alján vagyunk → utolsó szekció (Kapcsolat)
+      if (!found) {
+        const atBottom =
+          Math.ceil(window.scrollY + window.innerHeight) >=
+          Math.ceil(document.documentElement.scrollHeight)
+        if (atBottom && els.length) {
+          active = els[els.length - 1].id
+          found = true
+        }
+      }
+
+      // 3) ha még mindig nincs találat, a NAV vonalhoz legközelebbi szekció teteje
+      if (!found) {
+        let closest = Number.POSITIVE_INFINITY
+        let closestId = active
+        for (const el of els) {
+          const d = Math.abs(el.getBoundingClientRect().top - y)
+          if (d < closest) {
+            closest = d
+            closestId = el.id
+          }
+        }
+        active = closestId
+      }
+
+      setActiveSection(prev => (prev === active ? prev : active))
+    }
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true
+        requestAnimationFrame(() => {
+          updateActive()
+          ticking = false
+        })
+      }
+    }
+
+    // kezdeti frissítés + események
+    updateActive()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    window.addEventListener('hashchange', updateActive)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      window.removeEventListener('hashchange', updateActive)
+    }
+  }, [navH, sectionIds])
 
   return (
     <div className="bg-gray-100 dark:bg-slate-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-500">
@@ -102,10 +153,11 @@ export default function App() {
   const [route, setRoute] = React.useState<string>(() =>
     typeof window !== 'undefined' ? window.location.hash : ''
   )
+
   React.useEffect(() => {
-    const handleHashChange = () => setRoute(window.location.hash)
-    window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
+    const onHash = () => setRoute(window.location.hash)
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
   return (
@@ -114,7 +166,9 @@ export default function App() {
         <React.Suspense fallback={<div className="h-screen w-full flex items-center justify-center">Loading...</div>}>
           <AdminLazy />
         </React.Suspense>
-      ) : <MainPage />}
+      ) : (
+        <MainPage />
+      )}
     </ProjectsProvider>
   )
 }
