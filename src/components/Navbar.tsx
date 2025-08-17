@@ -23,7 +23,7 @@ export default function Navbar({
   }, [mobileOpen])
 
   return (
-    <header id="site-header" className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm dark:shadow-slate-800/50 h-[88px]">
+    <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm dark:shadow-slate-800/50 h-[88px]">
       <div className="container mx-auto px-6 h-full flex justify-between items-center">
         <a href="/#" className="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2" aria-label="Ugrás a kezdőlapra">
           <span className="text-indigo-500">{'<'}</span>Kiss Gábor<span className="text-indigo-500">{'/>'}</span>

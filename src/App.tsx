@@ -24,49 +24,69 @@ function MainPage() {
     try { localStorage.setItem('theme', theme) } catch {}
     const meta = ensureMeta('theme-color')
     meta.content = theme === 'dark' ? '#0f172a' : '#ffffff'
-    setDynamicFavicon(theme) // string union, nem boolean
+    setDynamicFavicon(theme)
   }, [theme])
 
-  const toggleTheme = React.useCallback(
-    () => setTheme(t => (t === 'dark' ? 'light' : 'dark')),
-    []
-  )
+  const toggleTheme = React.useCallback(() => {
+    setTheme(t => (t === 'dark' ? 'light' : 'dark'))
+  }, [])
 
   const [activeSection, setActiveSection] = React.useState('home')
   const sectionIds = React.useMemo(
-    () => ['home', 'rolam', 'munkaim', 'oneletrajz', 'kapcsolat'],
+    () => ['home', 'rolam', 'projektek', 'oneletrajz', 'kapcsolat'],
     []
   )
 
-  // Hash-kattintáskor azonnal állítsuk be; a scroll úgyis „helyreigazít” utána
+  // Hash-kattintáskor azonnal állítsuk be; a scroll úgyis helyreigazít
   React.useEffect(() => {
-    const applyFromHash = () => {
+    const onHash = () => {
       const id = window.location.hash.replace(/^#/, '')
       if (id && sectionIds.includes(id)) setActiveSection(id)
     }
-    applyFromHash()
-    window.addEventListener('hashchange', applyFromHash)
-    return () => window.removeEventListener('hashchange', applyFromHash)
+    onHash()
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
   }, [sectionIds])
 
-  // Aktív szekció kiválasztása: a NAV vonal (CSS-ben megadott scroll-padding-top)
-  // és a viewport alja között mérjük az ÁTFEDÉST; a legnagyobb átfedésű nyer.
-  // KIVÉTEL: 'kapcsolat' → aktív, ha az ALJA bent van a viewportban, vagy a lap legalján vagyunk.
+  // A #home linkekre kattintáskor AZONNAL tegyük aktívvá a home-ot
+  React.useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null
+      if (!target) return
+      const link = target.closest('a[href="#home"]') as HTMLAnchorElement | null
+      if (link) {
+        setActiveSection('home')
+      }
+    }
+    window.addEventListener('click', onClick, true)
+    return () => window.removeEventListener('click', onClick, true)
+  }, [])
+
+  // Aktív kiválasztása: a nav offsetet CSS-ből olvassuk (scroll-padding-top),
+  // a sáv [topLine..viewportBottom] átfedése alapján döntünk.
+  // KIVÉTEL: kapcsolat (alja alapján) és LAP TETEJE eset (home).
   React.useEffect(() => {
     let ticking = false
 
     const getNavFromCSS = () => {
-      // pl. "88px" → 88
       const v = getComputedStyle(document.documentElement).getPropertyValue('scroll-padding-top')
       const n = parseFloat(v)
       return Number.isFinite(n) ? n : 88
     }
 
     const pickActive = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop || 0
+
+      // 0) LAP TETEJE: mindig 'home'
+      if (scrollTop <= 1) {
+        if (activeSection !== 'home') setActiveSection('home')
+        return
+      }
+
       const topLine = getNavFromCSS()
       const bottomLine = window.innerHeight
 
-      // 1) Kapcsolat külön szabály (alja alapján vagy legalja eset)
+      // 1) Kapcsolat külön szabály (alja alapján vagy legalja)
       const contact = document.getElementById('kapcsolat')
       if (contact) {
         const r = contact.getBoundingClientRect()
@@ -80,7 +100,7 @@ function MainPage() {
         }
       }
 
-      // 2) Legnagyobb átfedés a [topLine..bottomLine] sávval (Kapcsolat nélkül)
+      // 2) Legnagyobb átfedés a [topLine..bottomLine] sávval (kapcsolat nélkül)
       let bestId = sectionIds[0]
       let bestOverlap = -Infinity
 
@@ -111,7 +131,6 @@ function MainPage() {
       }
     }
 
-    // kezdeti futtatás + események
     pickActive()
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll)
@@ -119,7 +138,7 @@ function MainPage() {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
-    // activeSection nincs deps-ben, mert felesleges rerender loopot okozna
+    // activeSection nem kell a deps-be
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sectionIds])
 
@@ -160,5 +179,4 @@ export default function App() {
   )
 }
 
-// Lazy-load admin to keep main bundle small
 const AdminLazy = React.lazy(async () => ({ default: (await import('@/admin/AdminPage')).default }))
