@@ -33,6 +33,9 @@ function MainPage() {
   )
 
   const [activeSection, setActiveSection] = React.useState('home')
+  const activeRef = React.useRef(activeSection)
+  React.useEffect(() => { activeRef.current = activeSection }, [activeSection])
+
   const sectionIds = React.useMemo(
     () => ['home', 'rolam', 'projektek', 'oneletrajz', 'kapcsolat'],
     []
@@ -49,33 +52,36 @@ function MainPage() {
     return () => window.removeEventListener('hashchange', applyFromHash)
   }, [sectionIds])
 
-  // Aktív szekció kiválasztása: a NAV vonal (CSS-ben megadott scroll-padding-top)
-  // és a viewport alja között mérjük az ÁTFEDÉST; a legnagyobb átfedésű nyer.
-  // KIVÉTEL: 'kapcsolat' → aktív, ha az ALJA bent van a viewportban, vagy a lap legalján vagyunk.
-  // PLUSZ: ha közel vagyunk a lap tetejéhez, mindig 'home'.
+  // Aktív szekció kiválasztása: a NAV vonal (CSS: html{scroll-padding-top})
+  // és a viewport alja közti sáv átfedése alapján.
+  // - HOME: ha közel vagyunk a lap tetejéhez → mindig 'home'
+  // - KAPCSOLAT: az alja látszik, vagy lap legalja → 'kapcsolat'
   React.useEffect(() => {
     let ticking = false
 
     const getNavFromCSS = () => {
-      // pl. "88px" → 88
       const v = getComputedStyle(document.documentElement).getPropertyValue('scroll-padding-top')
       const n = parseFloat(v)
       return Number.isFinite(n) ? n : 88
     }
 
+    const setIfChanged = (id: string) => {
+      if (activeRef.current !== id) setActiveSection(id)
+    }
+
     const pickActive = () => {
       const topLine = getNavFromCSS()
       const bottomLine = window.innerHeight
+      const scrollTop = window.scrollY || document.documentElement.scrollTop || 0
 
       // 0) LAP TETEJE KÖZEL: mindig 'home'
-      const scrollTop = window.scrollY || document.documentElement.scrollTop || 0
-      const TOP_THRESHOLD = topLine * 0.6 // a nav-offset ~60%-a
+      const TOP_THRESHOLD = Math.max(16, topLine * 0.6) // rugalmas küszöb
       if (scrollTop <= TOP_THRESHOLD) {
-        if (activeSection !== 'home') setActiveSection('home')
+        setIfChanged('home')
         return
       }
 
-      // 1) Kapcsolat külön szabály (alja alapján vagy legalja eset)
+      // 1) Kapcsolat (alja alapján) vagy lap legalja
       const contact = document.getElementById('kapcsolat')
       if (contact) {
         const r = contact.getBoundingClientRect()
@@ -84,30 +90,44 @@ function MainPage() {
           Math.ceil(window.scrollY + window.innerHeight) >=
           Math.ceil(document.documentElement.scrollHeight)
         if (bottomInView || atBottom) {
-          if (activeSection !== 'kapcsolat') setActiveSection('kapcsolat')
+          setIfChanged('kapcsolat')
           return
         }
       }
 
       // 2) Legnagyobb átfedés a [topLine..bottomLine] sávval (Kapcsolat nélkül)
       let bestId = sectionIds[0]
-      let bestOverlap = -Infinity
+      let bestOverlap = -1
 
       for (const id of sectionIds) {
         if (id === 'kapcsolat') continue
         const el = document.getElementById(id)
         if (!el) continue
         const r = el.getBoundingClientRect()
-        const overlap = Math.min(r.bottom, bottomLine) - Math.max(r.top, topLine)
+        // clampelt átfedés (negatív → 0)
+        const overlap = Math.max(0, Math.min(r.bottom, bottomLine) - Math.max(r.top, topLine))
         if (overlap > bestOverlap) {
           bestOverlap = overlap
           bestId = id
         }
       }
 
-      if (bestId && activeSection !== bestId) {
-        setActiveSection(bestId)
+      // 3) Ha minden átfedés 0 (extrém gyors scroll / nagyon rövid szekciók),
+      //    válaszd a NAV vonalhoz legközelebbi szekció tetejét (Kapcsolat nélkül)
+      if (bestOverlap === 0) {
+        let closest = Number.POSITIVE_INFINITY
+        let closestId = bestId
+        for (const id of sectionIds) {
+          if (id === 'kapcsolat') continue
+          const el = document.getElementById(id)
+          if (!el) continue
+          const d = Math.abs(el.getBoundingClientRect().top - topLine)
+          if (d < closest) { closest = d; closestId = id }
+        }
+        bestId = closestId
       }
+
+      setIfChanged(bestId)
     }
 
     const onScroll = () => {
@@ -128,8 +148,6 @@ function MainPage() {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
-    // activeSection nincs deps-ben, mert felesleges rerender loopot okozna
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sectionIds])
 
   return (
