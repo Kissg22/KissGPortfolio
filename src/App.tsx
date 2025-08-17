@@ -24,7 +24,7 @@ function MainPage() {
     try { localStorage.setItem('theme', theme) } catch {}
     const meta = ensureMeta('theme-color')
     meta.content = theme === 'dark' ? '#0f172a' : '#ffffff'
-    setDynamicFavicon(theme) // string union, nem boolean
+    setDynamicFavicon(theme)
   }, [theme])
 
   const toggleTheme = React.useCallback(
@@ -36,26 +36,14 @@ function MainPage() {
   const activeRef = React.useRef(activeSection)
   React.useEffect(() => { activeRef.current = activeSection }, [activeSection])
 
+  // ⟵ ITT lett átírva 'projektek' → 'munkaim'
   const sectionIds = React.useMemo(
-    () => ['home', 'rolam', 'projektek', 'oneletrajz', 'kapcsolat'],
+    () => ['home', 'rolam', 'munkaim', 'oneletrajz', 'kapcsolat'],
     []
   )
 
-  // Hash-kattintáskor azonnal állítsuk be; a scroll úgyis „helyreigazít” utána
-  React.useEffect(() => {
-    const applyFromHash = () => {
-      const id = window.location.hash.replace(/^#/, '')
-      if (id && sectionIds.includes(id)) setActiveSection(id)
-    }
-    applyFromHash()
-    window.addEventListener('hashchange', applyFromHash)
-    return () => window.removeEventListener('hashchange', applyFromHash)
-  }, [sectionIds])
-
-  // Aktív szekció kiválasztása: a NAV vonal (CSS: html{scroll-padding-top})
-  // és a viewport alja közti sáv átfedése alapján.
-  // - HOME: ha közel vagyunk a lap tetejéhez → mindig 'home'
-  // - KAPCSOLAT: az alja látszik, vagy lap legalja → 'kapcsolat'
+  // Aktív kiválasztása: a NAV offset (CSS: html{scroll-padding-top}) és a viewport alja közti sáv
+  // átfedése alapján. Home: tetején mindig home. Kapcsolat: alja látszik vagy legalja → kapcsolat.
   React.useEffect(() => {
     let ticking = false
 
@@ -74,8 +62,8 @@ function MainPage() {
       const bottomLine = window.innerHeight
       const scrollTop = window.scrollY || document.documentElement.scrollTop || 0
 
-      // 0) LAP TETEJE KÖZEL: mindig 'home'
-      const TOP_THRESHOLD = Math.max(16, topLine * 0.6) // rugalmas küszöb
+      // 0) Lap teteje közel: mindig home
+      const TOP_THRESHOLD = Math.max(16, topLine * 0.6)
       if (scrollTop <= TOP_THRESHOLD) {
         setIfChanged('home')
         return
@@ -104,7 +92,6 @@ function MainPage() {
         const el = document.getElementById(id)
         if (!el) continue
         const r = el.getBoundingClientRect()
-        // clampelt átfedés (negatív → 0)
         const overlap = Math.max(0, Math.min(r.bottom, bottomLine) - Math.max(r.top, topLine))
         if (overlap > bestOverlap) {
           bestOverlap = overlap
@@ -112,8 +99,7 @@ function MainPage() {
         }
       }
 
-      // 3) Ha minden átfedés 0 (extrém gyors scroll / nagyon rövid szekciók),
-      //    válaszd a NAV vonalhoz legközelebbi szekció tetejét (Kapcsolat nélkül)
+      // 3) Ha minden átfedés 0: NAV vonalhoz legközelebbi szekció teteje
       if (bestOverlap === 0) {
         let closest = Number.POSITIVE_INFINITY
         let closestId = bestId
@@ -140,7 +126,6 @@ function MainPage() {
       }
     }
 
-    // kezdeti futtatás + események
     pickActive()
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll)
@@ -157,6 +142,7 @@ function MainPage() {
       <main id="content" className="outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
         <HeroSection />
         <AboutSection />
+        {/* komponens neve maradhat, a szekció ID a fontos */}
         <ProjectsSection />
         <ResumeSection />
         <ContactSection />
