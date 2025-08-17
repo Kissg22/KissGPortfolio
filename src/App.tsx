@@ -29,7 +29,7 @@ function MainPage() {
 
   const [activeSection, setActiveSection] = React.useState('home')
   // FIX: elírás javítva: 'oneltrajt' -> 'oneletrajz'
-  const sectionIds = React.useMemo(() => ['home', 'rolam', 'projektek', 'oneletrajz', 'kapcsolat'], [])
+  const sectionIds = React.useMemo(() => ['home', 'rolam', 'munkaim', 'oneletrajz', 'kapcsolat'], [])
 
   // 1) IntersectionObserver mindenre, KIVÉVE 'kapcsolat'
   React.useEffect(() => {

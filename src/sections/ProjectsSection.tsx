@@ -23,7 +23,7 @@ export default function ProjectsSection() {
   }, [searchTerm, activeFilter, projects])
 
   return (
-    <section id="projektek" className="scroll-mt-32 py-20 bg-gray-100 dark:bg-slate-900">
+    <section id="munkaim" className="scroll-mt-48 py-20 bg-gray-100 dark:bg-slate-900">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-center">

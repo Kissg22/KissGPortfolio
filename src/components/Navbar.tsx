@@ -8,7 +8,7 @@ export default function Navbar({
   const navItems = [
     { id: 'home', label: 'Kezdőlap' },
     { id: 'rolam', label: 'Rólam' },
-    { id: 'projektek', label: 'Projektek' },
+    { id: 'munkaim', label: 'Munkáim' },
     { id: 'oneletrajz', label: 'Önéletrajz' }, 
     { id: 'kapcsolat', label: 'Kapcsolat' },
     { id: 'admin', label: 'Admin' },
