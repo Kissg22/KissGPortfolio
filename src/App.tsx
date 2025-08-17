@@ -24,7 +24,7 @@ function MainPage() {
     try { localStorage.setItem('theme', theme) } catch {}
     const meta = ensureMeta('theme-color')
     meta.content = theme === 'dark' ? '#0f172a' : '#ffffff'
-    setDynamicFavicon(theme) // fontos: string union, nem boolean
+    setDynamicFavicon(theme)
   }, [theme])
 
   const toggleTheme = React.useCallback(
@@ -32,8 +32,8 @@ function MainPage() {
     []
   )
 
-  // Nav magasság mérése + CSS változó beállítása
-  const [navH, setNavH] = React.useState(88)
+  // Navbar magassága (dinamikusan mérve) + CSS változó a sima anchor scrollhoz
+  const [navH, setNavH] = React.useState<number>(88)
   React.useEffect(() => {
     const header = document.getElementById('site-header')
     const getH = () => Math.max(0, header?.offsetHeight ?? 88)
@@ -58,57 +58,72 @@ function MainPage() {
     []
   )
 
-  // Stabil aktív-szekció észlelés "vonal" alapján (navbar alja),
-  // + oldal legalja fallback (Kapcsolat aktív lesz)
+  // Hash váltáskor azonnal állítsuk be az aktív szekciót
+  React.useEffect(() => {
+    const applyFromHash = () => {
+      const id = window.location.hash.replace(/^#/, '')
+      if (id && sectionIds.includes(id)) setActiveSection(id)
+    }
+    applyFromHash()
+    window.addEventListener('hashchange', applyFromHash)
+    return () => window.removeEventListener('hashchange', applyFromHash)
+  }, [sectionIds])
+
+  // Stabil aktív-detektálás:
+  // - NAV_LINE = navbar alja + 8px, ehhez viszonyítjuk a szekciókat (KIVÉVE 'kapcsolat')
+  // - 'kapcsolat' csak akkor aktív, ha az ALJA bent van a viewportban, vagy az oldal legalján vagyunk
   React.useEffect(() => {
     let ticking = false
 
     const updateActive = () => {
-      const NAV = navH
-      const y = NAV + 1 // a vonal, ami alatt "nézünk"
-      let active = sectionIds[0]
+      const NAV_LINE = (typeof navH === 'number' ? navH : 88) + 8
+      let next = activeSection
 
       const els = sectionIds
         .map(id => document.getElementById(id))
         .filter((el): el is HTMLElement => !!el)
 
-      // 1) amelyik szekció átfedi a NAV vonalat
+      // 1) Kapcsolat (alja alapján)
+      const contact = document.getElementById('kapcsolat')
+      if (contact) {
+        const r = contact.getBoundingClientRect()
+        const vh = window.innerHeight
+        const bottomInView = r.bottom <= vh && r.top < vh
+        const atBottom =
+          Math.ceil(window.scrollY + window.innerHeight) >=
+          Math.ceil(document.documentElement.scrollHeight)
+        if (bottomInView || atBottom) {
+          next = 'kapcsolat'
+          if (next !== activeSection) setActiveSection(next)
+          return
+        }
+      }
+
+      // 2) Többi szekció – amelyik átfedi a NAV_LINE-t
       let found = false
       for (const el of els) {
+        if (el.id === 'kapcsolat') continue
         const r = el.getBoundingClientRect()
-        if (r.top <= y && r.bottom > y) {
-          active = el.id
+        if (r.top <= NAV_LINE && r.bottom > NAV_LINE) {
+          next = el.id
           found = true
           break
         }
       }
 
-      // 2) ha nem találtunk, de az oldal alján vagyunk → utolsó szekció (Kapcsolat)
-      if (!found) {
-        const atBottom =
-          Math.ceil(window.scrollY + window.innerHeight) >=
-          Math.ceil(document.documentElement.scrollHeight)
-        if (atBottom && els.length) {
-          active = els[els.length - 1].id
-          found = true
-        }
-      }
-
-      // 3) ha még mindig nincs találat, a NAV vonalhoz legközelebbi szekció teteje
+      // 3) Ha nincs pontos találat: NAV_LINE-hoz legközelebbi szekció teteje (kapcsolat nélkül)
       if (!found) {
         let closest = Number.POSITIVE_INFINITY
-        let closestId = active
+        let closestId = next
         for (const el of els) {
-          const d = Math.abs(el.getBoundingClientRect().top - y)
-          if (d < closest) {
-            closest = d
-            closestId = el.id
-          }
+          if (el.id === 'kapcsolat') continue
+          const d = Math.abs(el.getBoundingClientRect().top - NAV_LINE)
+          if (d < closest) { closest = d; closestId = el.id }
         }
-        active = closestId
+        next = closestId
       }
 
-      setActiveSection(prev => (prev === active ? prev : active))
+      if (next !== activeSection) setActiveSection(next)
     }
 
     const onScroll = () => {
@@ -121,17 +136,14 @@ function MainPage() {
       }
     }
 
-    // kezdeti frissítés + események
     updateActive()
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll)
-    window.addEventListener('hashchange', updateActive)
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
-      window.removeEventListener('hashchange', updateActive)
     }
-  }, [navH, sectionIds])
+  }, [navH, sectionIds, activeSection])
 
   return (
     <div className="bg-gray-100 dark:bg-slate-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-500">
@@ -155,9 +167,9 @@ export default function App() {
   )
 
   React.useEffect(() => {
-    const onHash = () => setRoute(window.location.hash)
-    window.addEventListener('hashchange', onHash)
-    return () => window.removeEventListener('hashchange', onHash)
+    const handleHashChange = () => setRoute(window.location.hash)
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
   return (
@@ -166,9 +178,7 @@ export default function App() {
         <React.Suspense fallback={<div className="h-screen w-full flex items-center justify-center">Loading...</div>}>
           <AdminLazy />
         </React.Suspense>
-      ) : (
-        <MainPage />
-      )}
+      ) : <MainPage />}
     </ProjectsProvider>
   )
 }
