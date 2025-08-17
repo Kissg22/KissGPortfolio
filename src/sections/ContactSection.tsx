@@ -16,7 +16,7 @@ export default function ContactSection() {
   }
 
   return (
-    <section id="kapcsolat" className="scroll-mt-24 py-20 bg-gradient-to-b from-transparent to-slate-50 dark:to-slate-950">
+    <section id="kapcsolat" className="py-20 bg-gradient-to-b from-transparent to-slate-50 dark:to-slate-950">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-center">
