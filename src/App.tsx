@@ -8,6 +8,7 @@ import ProjectsSection from '@/sections/ProjectsSection'
 import ContactSection from '@/sections/ContactSection'
 import { ProjectsProvider } from '@/context/ProjectsContext'
 import { ensureMeta, setDynamicFavicon } from '@/utils/dom'
+import ResumeSection from './sections/ResumeSection'
 
 function MainPage() {
   const [theme, setTheme] = React.useState<'light' | 'dark'>(() => {
@@ -54,6 +55,7 @@ function MainPage() {
         <HeroSection />
         <AboutSection />
         <ProjectsSection />
+        <ResumeSection />
         <ContactSection />
       </main>
       <Footer />

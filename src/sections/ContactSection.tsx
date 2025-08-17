@@ -47,7 +47,7 @@ export default function ContactSection() {
                 <button
                   type="button"
                   onClick={copyEmail}
-                  className="hidden sm:inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 font-medium text-slate-900 dark:text-slate-100 shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:translate-y-px transition"
+                  className="hidden sm:inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 font-medium text-slate-900 dark:text-slate-100 shadow-sm hover:shadow-lg hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
                   aria-live="polite"
                 >
                   {copied ? <Check className="h-5 w-5 text-emerald-600" /> : <Copy className="h-5 w-5" />}
@@ -62,7 +62,7 @@ export default function ContactSection() {
             <button
               type="button"
               onClick={copyEmail}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-3.5 font-medium text-slate-900 dark:text-slate-100 shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 active:translate-y-px transition"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-3.5 font-medium text-slate-900 dark:text-slate-100 shadow-sm hover:shadow-lg hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
               aria-live="polite"
             >
               {copied ? <Check className="h-5 w-5 text-emerald-600" /> : <Copy className="h-5 w-5" />}
@@ -70,18 +70,18 @@ export default function ContactSection() {
             </button>
           </div>
 
-          {/* Írj nekem (mailto) – teljes szélesség */}
+          {/* Írj nekem (mailto) – teljes szélesség, látványosabb hover */}
           <a
             href={`mailto:${email}`}
             aria-label={`E-mail küldése: ${email}`}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-medium bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-medium bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm hover:shadow-xl hover:from-indigo-500 hover:to-violet-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
           >
             <Mail className="h-5 w-5" />
             Írj nekem
           </a>
 
           <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-            Tipp: az email kártyán látod a címet, mobilon a „Másolás” gomb külön jelenik meg fölötte.
+            Tipp: az „Írj nekem” gomb a levelezőt nyitja meg, a „Másolás” gomb a vágólapra teszi az e-mail címet.
           </p>
 
           {/* SR visszajelzés olvasóprogramoknak */}

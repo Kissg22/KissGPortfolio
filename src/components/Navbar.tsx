@@ -9,6 +9,7 @@ export default function Navbar({
     { id: 'home', label: 'Kezdőlap' },
     { id: 'rolam', label: 'Rólam' },
     { id: 'projektek', label: 'Projektek' },
+    { id: 'oneletrajz', label: 'Önéletrajz' }, 
     { id: 'kapcsolat', label: 'Kapcsolat' },
     { id: 'admin', label: 'Admin' },
   ]
