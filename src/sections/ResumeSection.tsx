@@ -88,7 +88,7 @@ function TimelineItem({ entry }: { entry: Entry }) {
 
 export default function ResumeSection() {
   return (
-    <section id="oneletrajz" className="scroll-mt-48 py-20 bg-white dark:bg-slate-900">
+    <section id="oneletrajz" className=" py-20 bg-white dark:bg-slate-900">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-3">

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Globális görgetés offset a navbarhoz (nem kell scroll-mt hack) */
+/* Globális görgetés offset a navbarhoz */
 html {
   scroll-behavior: smooth;
   scroll-padding-top: var(--nav-h, 88px);

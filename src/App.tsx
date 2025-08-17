@@ -24,7 +24,7 @@ function MainPage() {
     try { localStorage.setItem('theme', theme) } catch {}
     const meta = ensureMeta('theme-color')
     meta.content = theme === 'dark' ? '#0f172a' : '#ffffff'
-    setDynamicFavicon(theme)
+    setDynamicFavicon(theme) // string union, nem boolean
   }, [theme])
 
   const toggleTheme = React.useCallback(
@@ -32,33 +32,13 @@ function MainPage() {
     []
   )
 
-  // Navbar magassága (dinamikusan mérve) + CSS változó a sima anchor scrollhoz
-  const [navH, setNavH] = React.useState<number>(88)
-  React.useEffect(() => {
-    const header = document.getElementById('site-header')
-    const getH = () => Math.max(0, header?.offsetHeight ?? 88)
-    const apply = () => {
-      const h = getH()
-      setNavH(h)
-      document.documentElement.style.setProperty('--nav-h', `${h}px`)
-    }
-    apply()
-    const ro = new ResizeObserver(apply)
-    if (header) ro.observe(header)
-    window.addEventListener('resize', apply)
-    return () => {
-      ro.disconnect()
-      window.removeEventListener('resize', apply)
-    }
-  }, [])
-
   const [activeSection, setActiveSection] = React.useState('home')
   const sectionIds = React.useMemo(
     () => ['home', 'rolam', 'projektek', 'oneletrajz', 'kapcsolat'],
     []
   )
 
-  // Hash váltáskor azonnal állítsuk be az aktív szekciót
+  // Hash-kattintáskor azonnal állítsuk be; a scroll úgyis „helyreigazít” utána
   React.useEffect(() => {
     const applyFromHash = () => {
       const id = window.location.hash.replace(/^#/, '')
@@ -69,81 +49,79 @@ function MainPage() {
     return () => window.removeEventListener('hashchange', applyFromHash)
   }, [sectionIds])
 
-  // Stabil aktív-detektálás:
-  // - NAV_LINE = navbar alja + 8px, ehhez viszonyítjuk a szekciókat (KIVÉVE 'kapcsolat')
-  // - 'kapcsolat' csak akkor aktív, ha az ALJA bent van a viewportban, vagy az oldal legalján vagyunk
+  // Aktív szekció kiválasztása: a NAV vonal (CSS-ben megadott scroll-padding-top)
+  // és a viewport alja között mérjük az ÁTFEDÉST; a legnagyobb átfedésű nyer.
+  // KIVÉTEL: 'kapcsolat' → aktív, ha az ALJA bent van a viewportban, vagy a lap legalján vagyunk.
   React.useEffect(() => {
     let ticking = false
 
-    const updateActive = () => {
-      const NAV_LINE = (typeof navH === 'number' ? navH : 88) + 8
-      let next = activeSection
+    const getNavFromCSS = () => {
+      // pl. "88px" → 88
+      const v = getComputedStyle(document.documentElement).getPropertyValue('scroll-padding-top')
+      const n = parseFloat(v)
+      return Number.isFinite(n) ? n : 88
+    }
 
-      const els = sectionIds
-        .map(id => document.getElementById(id))
-        .filter((el): el is HTMLElement => !!el)
+    const pickActive = () => {
+      const topLine = getNavFromCSS()
+      const bottomLine = window.innerHeight
 
-      // 1) Kapcsolat (alja alapján)
+      // 1) Kapcsolat külön szabály (alja alapján vagy legalja eset)
       const contact = document.getElementById('kapcsolat')
       if (contact) {
         const r = contact.getBoundingClientRect()
-        const vh = window.innerHeight
-        const bottomInView = r.bottom <= vh && r.top < vh
+        const bottomInView = r.bottom <= bottomLine && r.top < bottomLine
         const atBottom =
           Math.ceil(window.scrollY + window.innerHeight) >=
           Math.ceil(document.documentElement.scrollHeight)
         if (bottomInView || atBottom) {
-          next = 'kapcsolat'
-          if (next !== activeSection) setActiveSection(next)
+          if (activeSection !== 'kapcsolat') setActiveSection('kapcsolat')
           return
         }
       }
 
-      // 2) Többi szekció – amelyik átfedi a NAV_LINE-t
-      let found = false
-      for (const el of els) {
-        if (el.id === 'kapcsolat') continue
+      // 2) Legnagyobb átfedés a [topLine..bottomLine] sávval (Kapcsolat nélkül)
+      let bestId = sectionIds[0]
+      let bestOverlap = -Infinity
+
+      for (const id of sectionIds) {
+        if (id === 'kapcsolat') continue
+        const el = document.getElementById(id)
+        if (!el) continue
         const r = el.getBoundingClientRect()
-        if (r.top <= NAV_LINE && r.bottom > NAV_LINE) {
-          next = el.id
-          found = true
-          break
+        const overlap = Math.min(r.bottom, bottomLine) - Math.max(r.top, topLine)
+        if (overlap > bestOverlap) {
+          bestOverlap = overlap
+          bestId = id
         }
       }
 
-      // 3) Ha nincs pontos találat: NAV_LINE-hoz legközelebbi szekció teteje (kapcsolat nélkül)
-      if (!found) {
-        let closest = Number.POSITIVE_INFINITY
-        let closestId = next
-        for (const el of els) {
-          if (el.id === 'kapcsolat') continue
-          const d = Math.abs(el.getBoundingClientRect().top - NAV_LINE)
-          if (d < closest) { closest = d; closestId = el.id }
-        }
-        next = closestId
+      if (bestId && activeSection !== bestId) {
+        setActiveSection(bestId)
       }
-
-      if (next !== activeSection) setActiveSection(next)
     }
 
     const onScroll = () => {
       if (!ticking) {
         ticking = true
         requestAnimationFrame(() => {
-          updateActive()
+          pickActive()
           ticking = false
         })
       }
     }
 
-    updateActive()
+    // kezdeti futtatás + események
+    pickActive()
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll)
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
-  }, [navH, sectionIds, activeSection])
+    // activeSection nincs deps-ben, mert felesleges rerender loopot okozna
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sectionIds])
 
   return (
     <div className="bg-gray-100 dark:bg-slate-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-500">
@@ -165,7 +143,6 @@ export default function App() {
   const [route, setRoute] = React.useState<string>(() =>
     typeof window !== 'undefined' ? window.location.hash : ''
   )
-
   React.useEffect(() => {
     const handleHashChange = () => setRoute(window.location.hash)
     window.addEventListener('hashchange', handleHashChange)
