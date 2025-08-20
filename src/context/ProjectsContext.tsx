@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { Project } from '@/types'
 import { getFirebase } from '@/lib/firebase'
-import { signInAnonymously, onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth'
 import { collection, onSnapshot, addDoc, deleteDoc, doc, writeBatch, getDocs, query, orderBy } from 'firebase/firestore'
 
 type ProjectsContextType = {
@@ -44,31 +43,9 @@ const defaultProjectsData: Omit<Project, 'id'>[] = [
 
 export function ProjectsProvider({ children }: { children: React.ReactNode }) {
   const [projects, setProjects] = useState<Project[]>([])
-  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
 
-  // Auth (anonymous sign-in) – getFirebase() használata
+  // Firestore realtime projects – NINCS többé auth/anon belépés
   useEffect(() => {
-    let unsubscribe = () => {}
-    ;(async () => {
-      try {
-        const { auth } = await getFirebase()
-        unsubscribe = onAuthStateChanged(auth, user => {
-          if (user) {
-            setFirebaseUser(user)
-          } else {
-            signInAnonymously(auth).catch(err => console.error('Anonymous sign-in failed:', err))
-          }
-        })
-      } catch (e) {
-        console.error('Auth init error:', e)
-      }
-    })()
-    return () => unsubscribe()
-  }, [])
-
-  // Firestore realtime projects – getFirebase() használata
-  useEffect(() => {
-    if (!firebaseUser) return
     let unsubscribe = () => {}
     ;(async () => {
       try {
@@ -90,7 +67,7 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
       }
     })()
     return () => unsubscribe()
-  }, [firebaseUser])
+  }, [])
 
   const addProject = async (p: Omit<Project, 'id' | 'createdAt'>) => {
     try {

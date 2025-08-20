@@ -153,6 +153,17 @@ function MainPage() {
 }
 
 export default function App() {
+  // Globális 'dark' osztály beállítása, hogy az #admin route és a fallback is helyes színt kapjon
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const stored = localStorage.getItem('theme')
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const initial = (stored === 'light' || stored === 'dark') ? stored : (prefersDark ? 'dark' : 'light')
+      document.documentElement.classList.toggle('dark', initial === 'dark')
+    } catch {}
+  }, [])
+
   const [route, setRoute] = React.useState<string>(() =>
     typeof window !== 'undefined' ? window.location.hash : ''
   )
@@ -165,10 +176,22 @@ export default function App() {
   return (
     <ProjectsProvider>
       {route === '#admin' ? (
-        <React.Suspense fallback={<div className="h-screen w-full flex items-center justify-center">Loading...</div>}>
+        <React.Suspense
+          fallback={
+            <div
+              className="h-screen w-full flex items-center justify-center
+                         bg-gray-100 dark:bg-slate-900
+                         text-black dark:text-white"
+            >
+              Loading...
+            </div>
+          }
+        >
           <AdminLazy />
         </React.Suspense>
-      ) : <MainPage />}
+      ) : (
+        <MainPage />
+      )}
     </ProjectsProvider>
   )
 }
