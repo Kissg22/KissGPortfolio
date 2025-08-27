@@ -36,9 +36,9 @@ function MainPage() {
   const activeRef = React.useRef(activeSection)
   React.useEffect(() => { activeRef.current = activeSection }, [activeSection])
 
-  // ⟵ ITT lett átírva 'projektek' → 'munkaim'
+  // ⟵ ITT lett átírva 'projektek' → 'projektek'
   const sectionIds = React.useMemo(
-    () => ['home', 'rolam', 'munkaim', 'oneletrajz', 'kapcsolat'],
+    () => ['home', 'projektek', 'rolam', 'oneletrajz', 'kapcsolat'],
     []
   )
 
@@ -141,9 +141,9 @@ function MainPage() {
       <Navbar theme={theme} toggleTheme={toggleTheme} activeSection={activeSection} />
       <main id="content" className="outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
         <HeroSection />
+        <ProjectsSection />
         <AboutSection />
         {/* komponens neve maradhat, a szekció ID a fontos */}
-        <ProjectsSection />
         <ResumeSection />
         <ContactSection />
       </main>

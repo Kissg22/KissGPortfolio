@@ -1,5 +1,5 @@
 import React from 'react'
-import { GraduationCap, Briefcase } from 'lucide-react'
+import { GraduationCap, Briefcase, FileText } from 'lucide-react'
 
 type Entry = {
   title: string
@@ -20,13 +20,7 @@ const education: Entry[] = [
     details: 'Backend + frontend alapok, adatbázisok, projektmunka.',
     tags: ['Backend', 'Frontend', 'SQL'],
   },
-  {
-    title: 'Műszaki / Informatikai tanulmányok',
-    org: 'Iskola / Egyetem',
-    period: '2021 – 2023',
-    details: 'Programozási alapok, webes technológiák.',
-    tags: ['HTML', 'CSS', 'JavaScript'],
-  },
+
 ]
 
 const experience: Entry[] = [
@@ -39,14 +33,7 @@ const experience: Entry[] = [
       'Termékkezelés, akciók, integrációk. Automatikus feed-feldolgozás és árkalkuláció ötletek.',
     tags: ['Shopify', 'Automatizálás', 'Integráció'],
   },
-  {
-    title: 'Saját projektek (freelance / hobbiprojektek)',
-    org: 'Önálló',
-    period: '2022 – jelenleg',
-    details:
-      'Portfólió, admin panelek, REST API-k, Firestore, anon auth. Demók és PoC-ek.',
-    tags: ['React', 'TypeScript', 'Firebase'],
-  },
+
 ]
 
 function TimelineItem({ entry }: { entry: Entry }) {
@@ -88,9 +75,9 @@ function TimelineItem({ entry }: { entry: Entry }) {
 
 export default function ResumeSection() {
   return (
-    <section id="oneletrajz" className=" py-20 bg-white dark:bg-slate-900">
+    <section id="oneletrajz" className="py-20 bg-white dark:bg-slate-900">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-12">
+        <div className="text-center mb-6 md:mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 flex items-center justify-center gap-3">
             <GraduationCap className="text-indigo-500" size={32} />
             Önéletrajz – Tanulmány & Munka
@@ -98,6 +85,21 @@ export default function ResumeSection() {
           <p className="text-lg text-gray-600 dark:text-gray-400">
             Az alábbi idővonalon a tanulmányaim és szakmai tapasztalataim láthatók.
           </p>
+        </div>
+
+        {/* NAGY CV GOMB */}
+        <div className="flex justify-center mb-12">
+          <a
+            href="/cv.pdf"              // public/cv.pdf -> böngészőben nyílik meg
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Önéletrajz megnyitása PDF-ben"
+            title="Önéletrajz (PDF) megnyitása"
+            className="inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-full shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          >
+            <FileText size={22} />
+            <span>Önéletrajz (PDF) megnyitása</span>
+          </a>
         </div>
 
         <div className="grid gap-12 md:grid-cols-2">

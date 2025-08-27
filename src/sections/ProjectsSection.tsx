@@ -23,13 +23,13 @@ export default function ProjectsSection() {
   }, [searchTerm, activeFilter, projects])
 
   return (
-    <section id="munkaim" className=" py-20 bg-gray-100 dark:bg-slate-900">
+    <section id="projektek" className=" py-20 bg-gray-100 dark:bg-slate-900">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-center">
-            <Briefcase className="mr-3 text-indigo-500" size={32} /> Munkáim
+            <Briefcase className="mr-3 text-indigo-500" size={32} /> Projektek
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Böngéssz a projektjeim között, használj szűrőket vagy keress kulcsszavak alapján.</p>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Böngéssz a projektjeim között — szűrj címkék szerint, vagy keress kulcsszóval.</p>
         </div>
 
         <div className="mb-8 p-4 bg-white/50 dark:bg-slate-800/50 rounded-lg space-y-4">

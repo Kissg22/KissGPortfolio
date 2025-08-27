@@ -7,11 +7,11 @@ export default function Navbar({
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const navItems = [
     { id: 'home', label: 'Kezdőlap' },
+    { id: 'projektek', label: 'Projektek' },
     { id: 'rolam', label: 'Rólam' },
-    { id: 'munkaim', label: 'Munkáim' },
     { id: 'oneletrajz', label: 'Önéletrajz' }, 
     { id: 'kapcsolat', label: 'Kapcsolat' },
-    { id: 'admin', label: 'Admin' },
+    { id: 'admin', label: 'Fiókom' },
   ]
 
   React.useEffect(() => {

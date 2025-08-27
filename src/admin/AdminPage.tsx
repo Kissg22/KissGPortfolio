@@ -43,7 +43,7 @@ export default function AdminPage() {
             <Shield /> <Lock />
           </div>
           <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Admin Belépés</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">Add meg a Firebase-ben beállított PIN kódot.</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">Add meg a PIN kódot.</p>
           <input
             value={pin}
             onChange={(e) => setPin(e.target.value)}
