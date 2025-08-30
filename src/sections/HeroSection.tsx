@@ -16,7 +16,7 @@ export default function HeroSection() {
                      after:bg-black/15 md:after:bg-black/20 after:pointer-events-none"
         >
           <img
-            src="/1756586193213.webp"
+            src="public/1756586193213.webp"
             alt="Kiss Gábor profilképe"
             className="absolute inset-0 w-full h-full object-cover [object-position:90%_15%]"
             width={224}
@@ -59,7 +59,7 @@ export default function HeroSection() {
           </a>
 
           <a
-            href="KissGaborOneletrajz.pdf"
+            href="public/KissGaborOneletrajz.pdf"
             target="_blank"
             rel="noopener noreferrer"
             title="Önéletrajz (PDF)"

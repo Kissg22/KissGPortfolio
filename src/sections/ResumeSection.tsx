@@ -119,7 +119,7 @@ export default function ResumeSection() {
 
         <div className="flex justify-center mb-12">
           <a
-            href="KissGaborOneletrajz.pdf"
+            href="public/KissGaborOneletrajz.pdf"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Önéletrajz megnyitása PDF-ben"
