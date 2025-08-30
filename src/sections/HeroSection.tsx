@@ -5,20 +5,34 @@ export default function HeroSection() {
   return (
     <section id="home" className="text-center bg-gray-100 dark:bg-slate-900 px-4 pt-20 md:pt-24 pb-20 md:pb-28">
       <div className="max-w-4xl mx-auto flex flex-col items-center">
-        <img
-          src="https://placehold.co/128x128/4338ca/ffffff?text=KG"
-          alt="Kiss Gábor profilképe"
-          className="rounded-full w-32 h-32 mb-6 shadow-xl border-4 border-indigo-500/50"
-          loading="lazy"
-          decoding="async"
-        />
+
+        {/* Avatar – nagyobb kör, finom sötétítés, nincs torzítás */}
+        <div
+          className="relative shrink-0 rounded-full overflow-hidden
+                     w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56
+                     mb-6 shadow-xl ring-4 ring-indigo-500/50
+                     bg-slate-200 dark:bg-slate-800/60
+                     after:content-[''] after:absolute after:inset-0
+                     after:bg-black/15 md:after:bg-black/20 after:pointer-events-none"
+        >
+          <img
+            src="/1756586193213.webp"
+            alt="Kiss Gábor profilképe"
+            className="absolute inset-0 w-full h-full object-cover [object-position:90%_15%]"
+            width={224}
+            height={224}
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+          />
+        </div>
 
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-white leading-tight mb-4">
           Szia, a nevem <span className="text-indigo-500 dark:text-indigo-400">Kiss Gábor</span>
         </h1>
 
         <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-          Szoftverfejlesztő és -tesztelő technikus vagyok, aki a megbízhatóságot és kitartást a sportból hozza a kódolás világába.
+          Szoftverfejlesztő és -tesztelő vagyok, aki a megbízhatóságot és kitartást a sportból hozza a kódolás világába.
         </p>
 
         {/* Social / Links */}
@@ -35,7 +49,7 @@ export default function HeroSection() {
           </a>
 
           <a
-            href="https://www.facebook.com/your.profile" // <-- cseréld a saját profilodra
+            href="https://www.facebook.com/profile.php?id=100010579658343"
             target="_blank"
             rel="noopener noreferrer"
             title="Facebook profil"
@@ -46,7 +60,7 @@ export default function HeroSection() {
           </a>
 
           <a
-            href="/cv.pdf" // public/cv.pdf -> böngészőben nyílik meg
+            href="KissGaborOneletrajz.pdf"
             target="_blank"
             rel="noopener noreferrer"
             title="Önéletrajz (PDF)"

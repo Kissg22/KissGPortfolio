@@ -10,38 +10,68 @@ type Entry = {
   tags?: string[]
 }
 
-// TODO: töltsd ki a saját adataiddal
 const education: Entry[] = [
   {
-    title: 'Szoftverfejlesztő és -tesztelő',
-    org: 'Képző Intézmény / Iskola',
-    period: '2023 – 2024',
+    title: 'Üzemmérnök-informatikus (BProf)',
+    org: 'Kodolányi János Egyetem – Budapest',
+    period: '2025.07 – jelenleg',
     location: 'Magyarország',
-    details: 'Backend + frontend alapok, adatbázisok, projektmunka.',
-    tags: ['Backend', 'Frontend', 'SQL'],
+    details: 'BProf üzemmérnök-informatikus képzés.',
+    tags: ['BProf', 'Informatika'],
   },
-
+  {
+    title: 'Szoftverfejlesztő és -tesztelő technikus – Érettségi',
+    org: 'Noszlopy Gáspár Közgazdasági Technikum – Kaposvár',
+    period: '2020.09 – 2025.06',
+    location: 'Magyarország',
+    details: 'Érettségi szoftverfejlesztő és -tesztelő szakirányon.',
+    tags: ['Szoftverfejlesztés', 'Tesztelés'],
+  },
 ]
 
 const experience: Entry[] = [
   {
-    title: 'Webáruház-menedzser (részmunkaidő)',
-    org: 'Cég / Projekt',
-    period: '2024 – jelenleg',
-    location: 'Remote',
+    title: 'IT & Sales Manager',
+    org: 'Simple Happy Zrt.',
+    period: '2025.05 – jelenleg',
+    location: 'Kaposvár',
     details:
-      'Termékkezelés, akciók, integrációk. Automatikus feed-feldolgozás és árkalkuláció ötletek.',
-    tags: ['Shopify', 'Automatizálás', 'Integráció'],
+      'Kapcsolattartás nagykereskedőkkel és webshop-partnerekkel; webshop felépítése, üzemeltetése és fejlesztése (API-integrációk, e-mail marketing, automatizálás); 10 000+ termékadat automatizált kezelése; rendszerek műszaki és logikai összehangolása.',
+    tags: ['Shopify', 'API-integráció', 'Automatizálás', 'E-mail marketing'],
   },
-
+  {
+    title: "McDonald's (Diákmunka)",
+    org: 'Színarany Kft. – Kaposvár',
+    period: '2024.10 – 2025.01',
+    location: 'Kaposvár',
+    details:
+      'Vendégek kiszolgálása és konyhai feladatok gyors tempójú környezetben; folyamatos multitasking és priorizálás; terhelhetőség és stressztűrés; csapaton belüli szoros együttműködés.',
+    tags: ['Gyorsétterem', 'Csapatmunka', 'Multitasking'],
+  },
+  {
+    title: 'Szoftverfejlesztő és -tesztelő technikus – Duális képzés',
+    org: 'Kaposvári Informatika Ágazati Képzőközpont Nonprofit Kft. – Kaposvár',
+    period: '2024.03 – 2025.04',
+    location: 'Kaposvár',
+    details:
+      'Szakma Kiváló Tanulója oklevél (2024/2025). Web- és alkalmazásfejlesztés (HTML/CSS/Bootstrap, JavaScript, Vue.js, Node.js, Express.js, .NET, PHP, REST API), verziókezelés (Git); mobilfejlesztés (Flutter); adatbázis (MySQL); unit/integrációs/ funkcionális tesztelés (pl. Postman).',
+    tags: ['Frontend', 'Backend', 'REST API', 'Git', 'Flutter', 'MySQL'],
+  },
+  {
+    title: 'Szoftverfejlesztő és -tesztelő technikus – Duális képzés',
+    org: 'BÁZIS INFORMATIKA Kft. – Kaposvár',
+    period: '2023.03 – 2023.07',
+    location: 'Kaposvár',
+    details:
+      'Szoftverfejlesztési ismeretek megszerzése gyakorlati környezetben; valós projektek több technológiával (C#, PHP, MySQL, Node.js, JavaScript, HTML/CSS, .NET, REST API, Bootstrap).',
+    tags: ['C#', 'PHP', 'MySQL', 'Node.js', 'JavaScript'],
+  },
 ]
 
 function TimelineItem({ entry }: { entry: Entry }) {
   return (
     <li className="relative pl-8">
-      {/* vertikális vonal */}
       <span className="absolute left-0 top-0 ml-[-1px] h-full w-0.5 bg-slate-200 dark:bg-slate-700" aria-hidden />
-      {/* pont */}
       <span className="absolute left-[-7px] top-1 inline-block h-3.5 w-3.5 rounded-full ring-4 ring-white dark:ring-slate-900 bg-indigo-500" aria-hidden />
 
       <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 shadow-sm">
@@ -87,10 +117,9 @@ export default function ResumeSection() {
           </p>
         </div>
 
-        {/* NAGY CV GOMB */}
         <div className="flex justify-center mb-12">
           <a
-            href="/cv.pdf"              // public/cv.pdf -> böngészőben nyílik meg
+            href="KissGaborOneletrajz.pdf"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Önéletrajz megnyitása PDF-ben"
@@ -103,7 +132,6 @@ export default function ResumeSection() {
         </div>
 
         <div className="grid gap-12 md:grid-cols-2">
-          {/* Tanulmányok */}
           <div>
             <div className="mb-5 flex items-center gap-2">
               <GraduationCap className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
@@ -111,12 +139,11 @@ export default function ResumeSection() {
             </div>
             <ol className="space-y-6 relative">
               {education.map((e, i) => (
-                <TimelineItem key={i} entry={e} />
+                <TimelineItem key={`${e.title}-${i}`} entry={e} />
               ))}
             </ol>
           </div>
 
-          {/* Munka */}
           <div>
             <div className="mb-5 flex items-center gap-2">
               <Briefcase className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
@@ -124,7 +151,7 @@ export default function ResumeSection() {
             </div>
             <ol className="space-y-6 relative">
               {experience.map((e, i) => (
-                <TimelineItem key={i} entry={e} />
+                <TimelineItem key={`${e.title}-${i}`} entry={e} />
               ))}
             </ol>
           </div>

@@ -2,7 +2,7 @@ import React from 'react'
 import { Mail, Copy, Check } from 'lucide-react'
 
 export default function ContactSection() {
-  const email = 'gabor.kiss@example.com'
+  const email = 'kissgabor5622@gmail.com'
   const [copied, setCopied] = React.useState(false)
 
   const copyEmail = async () => {

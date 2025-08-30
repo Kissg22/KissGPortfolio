@@ -44,7 +44,7 @@ export default function AboutSection() {
           <div>
             <h3 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">Főbb technológiáim</h3>
             <div className="flex flex-wrap gap-3 justify-center">
-              {['HTML/CSS','JavaScript','TypeScript','React','Vue.js','Node.js','PHP','.NET','Flutter','MySQL','PostgreSQL','MongoDB','Shopify','WordPress','Google Cloud','Azure','AWS','Docker','Google Sheets API','Stripe API','REST API','GraphQL','Git']
+              {['HTML/CSS','JavaScript','TypeScript','React','Vue.js','Node.js','PHP','.NET','Flutter','MySQL','PostgreSQL','MongoDB','Shopify','WordPress','Google Cloud','Azure','AWS','Docker','Google Sheets API','REST API','GraphQL','Git','Java']
                 .map(skill => (
                   <span key={skill} className="bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-200 text-sm font-medium px-4 py-2 rounded-md shadow-sm">{skill}</span>
                 ))}
