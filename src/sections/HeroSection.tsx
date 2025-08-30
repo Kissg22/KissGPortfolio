@@ -23,7 +23,6 @@ export default function HeroSection() {
             height={224}
             loading="eager"
             decoding="async"
-            fetchpriority="high"
           />
         </div>
 
