@@ -3,6 +3,9 @@ import type { Project } from '@/types'
 import ProjectTags from './ProjectTags'
 import { placeholderFor } from '@/utils/media'
 import { ExternalLink, Github } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import remarkBreaks from 'remark-breaks'
 
 const ProjectCard: React.FC<{ project: Project; onSelect: () => void }> = React.memo(({ project, onSelect }) => (
   <article className="w-full bg-white dark:bg-slate-800 rounded-xl shadow-lg hover:shadow-2xl dark:hover:shadow-indigo-500/20 overflow-hidden transform hover:-translate-y-2 transition-all duration-500 group flex flex-col">
@@ -24,7 +27,9 @@ const ProjectCard: React.FC<{ project: Project; onSelect: () => void }> = React.
       <div className="p-6 flex flex-col">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 truncate" title={project.title}>{project.title}</h3>
         {project.description && (
-          <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm line-clamp-3">{project.description}</p>
+          <div className="md-content text-gray-600 dark:text-gray-400 mb-4 text-sm line-clamp-3">
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{project.description}</ReactMarkdown>
+          </div>
         )}
         {(project.tags?.length ?? 0) > 0 && (
           <div className="pt-4 border-t border-gray-100 dark:border-slate-700">
@@ -66,4 +71,3 @@ const ProjectCard: React.FC<{ project: Project; onSelect: () => void }> = React.
 ))
 
 export default ProjectCard
-

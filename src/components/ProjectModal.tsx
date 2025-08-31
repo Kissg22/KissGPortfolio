@@ -3,6 +3,9 @@ import type { Project } from '@/types'
 import ProjectTags from './ProjectTags'
 import VideoEmbed from './VideoEmbed'
 import { X, ExternalLink, Github } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import remarkBreaks from 'remark-breaks'
 
 export default function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
   const containerRef = React.useRef<HTMLDivElement | null>(null)
@@ -58,7 +61,9 @@ export default function ProjectModal({ project, onClose }: { project: Project; o
             </div>
           )}
           {project.description && (
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">{project.description}</p>
+            <div className="md-content text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+              <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{project.description}</ReactMarkdown>
+            </div>
           )}
           <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-200 dark:border-slate-700">
             {project.liveUrl && (

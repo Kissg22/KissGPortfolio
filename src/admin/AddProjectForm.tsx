@@ -43,7 +43,8 @@ export default function AddProjectForm({ onAdd }: { onAdd: (p: Omit<Project, 'id
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium mb-1">Leírás</label>
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} placeholder="Bekezdéshez hagyj üres sort. Felsoroláshoz kezdj '-' vagy '*' jellel." className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p className="mt-1 text-xs text-gray-500">Tipp: Markdown támogatás – bekezdés: üres sor; felsorolás: sor elején <code>-</code> vagy <code>*</code>.</p>
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Kép URL</label>
